@@ -78,6 +78,10 @@ AbstractWorldTool::AbstractWorldTool(Id id,
     ActionManager::registerAction(mRemoveMapFromWorldAction, "RemoveMap");
     connect(mRemoveMapFromWorldAction, &QAction::triggered, this, &AbstractWorldTool::removeCurrentMapFromWorld);
 
+    mSnapToWorldGridAction = new QAction(this);
+    mSnapToWorldGridAction->setCheckable(true);
+    mSnapToWorldGridAction->setChecked(true);
+
     languageChangedImpl();
 }
 
@@ -137,6 +141,7 @@ void AbstractWorldTool::languageChangedImpl()
     mAddAnotherMapToWorldAction->setText(tr("Add another map to the current world"));
     mAddMapToWorldAction->setText(tr("Add the current map to a loaded world"));
     mRemoveMapFromWorldAction->setText(tr("Remove the current map from the current world"));
+    mSnapToWorldGridAction->setText(tr("Snap to World Grid"));
 }
 
 void AbstractWorldTool::updateEnabledState()
@@ -331,6 +336,8 @@ void AbstractWorldTool::populateToolBar(QToolBar *toolBar)
     toolBar->addAction(mAddAnotherMapToWorldAction);
     toolBar->addAction(mAddMapToWorldAction);
     toolBar->addAction(mRemoveMapFromWorldAction);
+    toolBar->addSeparator();
+    toolBar->addAction(mSnapToWorldGridAction);
 
     auto addMapToWorldButton = qobject_cast<QToolButton*>(toolBar->widgetForAction(mAddMapToWorldAction));
     auto addToWorldMenu = new QMenu(addMapToWorldButton);
@@ -352,8 +359,19 @@ void AbstractWorldTool::populateToolBar(QToolBar *toolBar)
 
 QPoint AbstractWorldTool::snapPoint(QPoint point, MapDocument *document) const
 {
-    point.setX(point.x() - point.x() % document->map()->tileWidth());
-    point.setY(point.y() - point.y() % document->map()->tileHeight());
+    if (!mSnapToWorldGridAction->isChecked())
+        return point;
+
+    const QSize gridSize = document->renderer()->mapBoundingRect().size();
+    const int gridWidth = gridSize.width();
+    const int gridHeight = gridSize.height();
+
+    // Use floor-based snapping so negative coordinates snap consistently.
+    if (gridWidth > 0)
+        point.setX(static_cast<int>(qFloor(static_cast<qreal>(point.x()) / gridWidth) * gridWidth));
+    if (gridHeight > 0)
+        point.setY(static_cast<int>(qFloor(static_cast<qreal>(point.y()) / gridHeight) * gridHeight));
+
     return point;
 }
 

@@ -89,6 +89,10 @@ Moving Maps
     Simply drag around maps within the map editor. You can abort moving a map
     by hitting 'Escape' or by right-clicking.
 
+    By default, moved maps snap to a world-sized grid based on the active
+    map bounds. You can disable this by unchecking the "Snap to World Grid"
+    toggle in the World Tool toolbar.
+
     Alternatively you can use the arrow keys to move the current selected map
     - holding Shift will perform bigger steps.
 

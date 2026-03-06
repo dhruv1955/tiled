@@ -100,6 +100,7 @@ private:
     QAction *mAddAnotherMapToWorldAction;
     QAction *mAddMapToWorldAction;
     QAction *mRemoveMapFromWorldAction;
+    QAction *mSnapToWorldGridAction;
 
     std::unique_ptr<SelectionRectangle> mSelectionRectangle;
 };
